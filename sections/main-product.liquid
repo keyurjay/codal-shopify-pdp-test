@@ -292,6 +292,48 @@
                         assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.increment
                       endif
                     -%}
+                    {% if product.metafields.custom.short_description %}
+                      <p class="product-short-description">
+                        {{ product.metafields.custom.short_description.value }}
+                      </p>
+                    {% endif %}
+
+                    
+
+                    {% render 'product-accordion', product: product %}
+
+                    {%- assign specs = product.metafields.specification -%}
+                    {%- if specs != blank -%}
+                      {% capture spec_table %}
+                        <table class="specification-table">
+                          {% for key in specs %}
+                            <tr>
+                              <td>{{ key | replace: "_", " " | capitalize }}</td>
+                              <td>{{ specs[key] }}</td>
+                            </tr>
+                          {% endfor %}
+                        </table>
+                      {% endcapture %}
+                      {% render 'accordion-item', title: 'Specification', content: spec_table %}
+                    {%- endif -%}
+
+                    {%- assign data_sheets = product.metafields.custom.data_sheet -%}
+                    {%- if data_sheets.size > 0 -%}
+                      {% capture sheet_links %}
+                        <ul>
+                          {% for item in data_sheets %}
+                            <li>
+                              <a href="{{ item.value }}" target="_blank" rel="noopener">
+                                {{ item.value | split: '/' | last }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      {% endcapture %}
+                      {% render 'accordion-item', title: 'Product Data Sheets (' | append: data_sheets.size | append: ')', content: sheet_links %}
+                    {%- endif -%}
+                  </div>
+
                     {%- if product.quantity_price_breaks_configured? -%}
                       <price-per-item
                         id="Price-Per-Item-{{ section.id }}"
@@ -2252,3 +2294,15 @@
   ]
 }
 {% endschema %}
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".accordion-header").forEach(function (header) {
+      header.addEventListener("click", function () {
+        const parent = this.closest(".accordion-item");
+        parent.classList.toggle("open");
+      });
+    });
+  });
+</script>

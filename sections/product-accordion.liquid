@@ -1,0 +1,124 @@
+{% comment %}
+  Sections/product-accordion.liquid
+  - Multiple accordions, all can be open at once
+  - Short description from custom.short_description
+  - “Product Description” only if product.description exists
+  - “Specification” table from specification namespace
+  - “Product Data Sheets” links from custom.data_sheet metafield
+{% endcomment %}
+
+<div class="product-accordions">
+
+  {%- if product.metafields.custom.short_description.value != blank -%}
+    <details open class="accordion-item">
+      <summary class="accordion-header">
+        <h3>Quick Overview</h3>
+      </summary>
+      <div class="accordion-body">
+        {{ product.metafields.custom.short_description.value }}
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if product.description != blank -%}
+    <details class="accordion-item">
+      <summary class="accordion-header">
+        <h3>Product Description</h3>
+      </summary>
+      <div class="accordion-body">
+        {{ product.description }}
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- assign specs = product.metafields.specification | map: "value" | first -%}
+  {%- if specs and specs != blank -%}
+    <details class="accordion-item">
+      <summary class="accordion-header">
+        <h3>Specification</h3>
+      </summary>
+      <div class="accordion-body">
+        <table class="spec-table">
+          {% for field in product.metafields.specification %}
+            <tr>
+              <th>{{ field.key | humanize }}</th>
+              <td>{{ field.value }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- assign data_sheets = product.metafields.custom.data_sheet -%}
+  {%- if data_sheets and data_sheets.value != blank -%}
+    {% assign sheets = data_sheets.value | split: "\n" %}
+    <details class="accordion-item">
+      <summary class="accordion-header">
+        <h3>
+          Product Data Sheets 
+          <span class="badge">{{ sheets.size }}</span>
+        </h3>
+      </summary>
+      <div class="accordion-body">
+        <ul class="data-sheet-list">
+          {% for url in sheets %}
+            <li>
+              <a href="{{ url }}" target="_blank" rel="noopener">
+                Data Sheet {{ forloop.index }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- comment -%}
+    You can add additional accordions here, e.g. “Add to List” placeholder
+  {%- endcomment -%}
+
+</div>
+
+<style>
+  /* Basic accordion styling—replace or extend with your Figma classes */
+  .accordion-item {
+    border-bottom: 1px solid #e2e2e2;
+    margin-bottom: 1rem;
+  }
+  .accordion-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .accordion-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+  .accordion-body {
+    padding: 0.75rem 1rem;
+  }
+  .badge {
+    background: #f0f0f0;
+    border-radius: 999px;
+    padding: 0.25em 0.75em;
+    font-size: 0.875rem;
+  }
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .spec-table th,
+  .spec-table td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+  }
+  .data-sheet-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .data-sheet-list li + li {
+    margin-top: 0.5rem;
+  }
+</style>
