@@ -292,11 +292,7 @@
                         assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.increment
                       endif
                     -%}
-                    {% if product.metafields.custom.short_description %}
-                      <p class="product-short-description">
-                        {{ product.metafields.custom.short_description.value }}
-                      </p>
-                    {% endif %}
+
 
                     
 
